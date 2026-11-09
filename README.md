@@ -205,7 +205,7 @@ Ouvrez `http://localhost:8080` dans votre navigateur.
 
 **Résultat :**
 
-![Page par défaut de Nginx](image.png)
+![Page par défaut de Nginx](captureecran/image.png)
 
 ### 5. Arrêter le conteneur
 
