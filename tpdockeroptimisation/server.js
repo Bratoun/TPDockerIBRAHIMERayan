@@ -24,7 +24,7 @@ app.get('/big', (_req, res) => {
         const data = fs.readFileSync(filePath, 'utf8');
         res.send(data.replace(/\n/g, '<br/>'));
     } else {
-        res.send('Fichier introuvable');
+        res.status(404).send('Fichier introuvable');
     }
 });
 
