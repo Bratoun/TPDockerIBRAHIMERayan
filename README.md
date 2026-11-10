@@ -234,3 +234,21 @@ docker rm mon_nginx
 ```text
 mon_nginx
 ```
+
+## TP Docker Optimisation du DockerFile
+
+### Analyse du code et du DockerFile
+
+**Analyse de `server.js` :**
+
+- Uniformiser l’indentation pour rendre le code plus lisible.
+- Pour les paramètres inutilisés, les préfixer par `_` peut aider à le signaler, selon les conventions du projet.
+- Le middleware `app.use` qui journalise les requêtes peut être activé seulement en développement si ces logs ne sont pas souhaités en production.
+- Pour `/big`, renvoyer le statut HTTP `404` lorsque le fichier est absent.
+- Remplacer la lecture synchrone par une lecture asynchrone évite de bloquer le traitement des autres requêtes pendant l’attente du disque. Il n’est pas nécessaire de vérifier d’abord si le fichier existe : on peut tenter de le lire et traiter l’erreur `ENOENT` s’il est absent.
+
+**Analyse de `dockerfile` :**
+
+- L’image `node:latest` peut changer de version sans prévenir. Il est préférable d’utiliser une version Node.js LTS explicite et une variante plus légère, après avoir vérifié la compatibilité des dépendances.
+- Il vaut mieux éviter de copier `node_modules` depuis la machine hôte, car ces modules peuvent ne pas être compatibles avec l’environnement du conteneur. On peut copier `package.json` et `package-lock.json`, puis installer les dépendances dans l’image avec `npm ci`.
+- Les paquets système installés avec `apt-get` (`build-essential`, `ca-certificates`, `locales`) sont à conserver uniquement s’ils sont nécessaires à l’application ou à ses dépendances car ils vont alourdir l'image.
