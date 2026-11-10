@@ -3,9 +3,9 @@ from pymongo import MongoClient
 
 app = Flask(__name__)	
 
-# Connexion à MongoDB (en local sur le port 27017)
+# Connexion au service MongoDB défini dans docker-compose.yml
 # Pour MongoDB Atlas, remplacez l'URI par votre chaîne de connexion 'mongodb+srv://...'
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient("mongodb://db:27017/")
 
 @app.route("/testBD")
 def accueil():
