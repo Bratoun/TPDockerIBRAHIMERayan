@@ -18,16 +18,19 @@ app.get('/', (_req, res) => {
 });
 
 
-app.get('/big', (_req, res) => {
+app.get('/big', async (_req, res) => {
     const filePath = path.join(__dirname, 'maybe-big-file.txt');
-    if (fs.existsSync(filePath)) {
-        const data = fs.readFileSync(filePath, 'utf8');
-        res.send(data.replace(/\n/g, '<br/>'));
-    } else {
-        res.status(404).send('Fichier introuvable');
+    try {
+        const data = await fs.promises.readFile(filePath, 'utf8');
+        res.type('text/plain').send(data);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return res.status(404).send('Fichier introuvable');
+        }
+        console.error('Erreur lors de la lecture du fichier :', error);
+        return res.status(500).send('Erreur lors de la lecture du fichier');
     }
 });
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
