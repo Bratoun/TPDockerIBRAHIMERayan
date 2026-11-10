@@ -234,3 +234,38 @@ docker rm mon_nginx
 ```text
 mon_nginx
 ```
+
+## TP Docker Optimisation du DockerFile
+
+### Analyse du code et du DockerFile
+
+**Analyse de `server.js` :**
+
+- Uniformiser l’indentation pour rendre le code plus lisible.
+- Pour les paramètres inutilisés, les préfixer par `_` peut aider à le signaler, selon les conventions du projet.
+- Le middleware `app.use` qui journalise les requêtes peut être activé seulement en développement si ces logs ne sont pas souhaités en production.
+- Pour `/big`, renvoyer le statut HTTP `404` lorsque le fichier est absent.
+- Remplacer la lecture synchrone par une lecture asynchrone évite de bloquer le traitement des autres requêtes pendant l’attente du disque. Il n’est pas nécessaire de vérifier d’abord si le fichier existe : on peut tenter de le lire et traiter l’erreur `ENOENT` s’il est absent.
+
+**Analyse de `dockerfile` :**
+
+- L’image `node:latest` peut changer de version sans prévenir. Il est préférable d’utiliser une version Node.js LTS explicite et une variante plus légère, après avoir vérifié la compatibilité des dépendances.
+- Il vaut mieux éviter de copier `node_modules` depuis la machine hôte, car ces modules peuvent ne pas être compatibles avec l’environnement du conteneur. On peut copier `package.json` et `package-lock.json`, puis installer les dépendances dans l’image avec `npm ci`.
+- Les paquets système installés avec `apt-get` (`build-essential`, `ca-certificates`, `locales`) sont à conserver uniquement s’ils sont nécessaires à l’application ou à ses dépendances car ils vont alourdir l'image.
+
+### Résultat de l'optimisation
+
+Après modification du Dockerfile, la taille de l'image est passée de **1,33 Go** à environ **264 Mo**, soit une réduction d'environ **80 %** (environ **1,07 Go** économisé).
+
+Nous avons aussi gangé du temps sur le temps de construction notre image.
+
+Cette réduction s'explique principalement par le choix d'une image de base plus légère, la suppression des dépendances système inutiles et l'exclusion du dossier `node_modules` local du contexte de build.
+
+**Image avant optimisation :**
+
+![Taille de l'image Docker avant optimisation](captureecran/image-avant-optimisation.png)
+
+**Image après optimisation :**
+
+![Taille de l'image Docker après optimisation](captureecran/image-apres-optimisation.png)
+
