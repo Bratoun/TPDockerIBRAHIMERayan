@@ -7,18 +7,18 @@ const app = express();
 
 
 // Middleware verbeux et un peu inutile
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 });
 
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
     res.send('Hello world — serveur volontairement non optimisé mais fonctionnel');
 });
 
 
-app.get('/big', (req, res) => {
+app.get('/big', (_req, res) => {
     const filePath = path.join(__dirname, 'maybe-big-file.txt');
     if (fs.existsSync(filePath)) {
         const data = fs.readFileSync(filePath, 'utf8');
