@@ -7,15 +7,16 @@ const app = express();
 
 
 // Middleware verbeux et un peu inutile
-app.use((req, _res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    next();
-});
+    if (process.env.NODE_ENV === 'development') {
+        app.use((req, _res, next) => {
+            console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+            next();
+        });
+    }
 
-
-app.get('/', (_req, res) => {
-    res.send('Hello world — serveur volontairement non optimisé mais fonctionnel');
-});
+    app.get('/', (_req, res) => {
+        res.send('Hello world — serveur volontairement non optimisé mais fonctionnel');
+    });
 
 
 app.get('/big', async (_req, res) => {
